@@ -1,6 +1,14 @@
 = dampfwalze
 
-Description goes here.
+This is a simple little script to automate your PR-squashing workflow, so long as your PR-squashing workflow looks a lot like mine.
+
+In particular:  I don't make contributors to my upstreams squash their own pull requests but I also don't really want to pollute the public history of my projects with a bunch of commits titled something like `CHECKPOINT CKPT WIP BBQ WHY DOESN'T THIS WORK YET`.  So when I accept a PR, I do something like this:
+
+* check out the remote branch,
+* generate a commit message consisting of the PR description, the PR number, and a summary of the commits in the remote branch,
+* squash the remote branch into trunk,
+* create a commit attributed to the author of the remote branch and signed off on by me, and
+* push trunk back to GitHub.
 
 == Contributing to dampfwalze
  
