@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "dampfwalze"
   gem.homepage = "http://github.com/willb/dampfwalze"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Automates a simple workflow for squashing pull requests}
+  gem.description = %Q{Dampfwalze is German for steamroller}
   gem.email = "willb@redhat.com"
   gem.authors = ["William Benton"]
   # dependencies defined in Gemfile
