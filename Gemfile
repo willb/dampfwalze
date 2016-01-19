@@ -2,6 +2,10 @@ source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
 #   gem "activesupport", ">= 2.3.5"
+gem "octokit", "~> 4.0"
+gem "thor", "~> 0.19.0"
+gem "git", "~> 1.2.9"
+
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
