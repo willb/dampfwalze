@@ -23,7 +23,6 @@
 # SOFTWARE.
 
 require 'octokit'
-require 'tempfile'
 require 'open3'
 require 'curl'
 
@@ -119,13 +118,7 @@ eos
       # curl -L #{pr.patch_url} | git apply --index
       # echo #{pr.mergeMessage} | git commit --author #{pr.primaryAuthor} --signoff -t -
       spawn_with_input(patch, ["/usr/bin/git", "apply", "--index"])
-        
-      Tempfile.create('commit') do |commit|
-        commit.write(mergeMessage)
-        commit.flush
-        output = spawn_and_capture(["/usr/bin/git", "commit", "--author", pr.primaryAuthor, "--signoff", "-F", commit.path])
-        print output
-      end
+      spawn_with_input(mergeMessage, ["/usr/bin/git", "commit", "--author", pr.primaryAuthor, "--signoff", "-F", commit.path])
     end
 
     include ProcessHelpers
