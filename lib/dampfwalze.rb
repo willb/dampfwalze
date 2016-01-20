@@ -82,8 +82,6 @@ module Dampfwalze
 Closes ##{@number} and squashes the following commits:
 
 #{summary}
-
-#{ "Signed-off-by: #{git_user}" if @signoff }
 eos
     end
 
