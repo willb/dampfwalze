@@ -23,8 +23,28 @@
 # SOFTWARE.
 
 require 'octokit'
+require 'tempfile'
+require 'open3'
+require 'curl'
 
 module Dampfwalze
+
+  module ProcessHelpers
+    def spawn_and_capture(*cmd)
+      Open3.popen3(*cmd) do |stdin, stdout, stderr, wait_thr|
+        exit_status = wait_thr.value
+        raise "command '#{cmd.inspect}' failed; more details follow:  #{stderr.read}" unless exit_status == 0
+        stdout.read
+      end
+    end
+
+    def spawn_with_input(str, *cmd)
+      out, err, s = Open3.capture3(*cmd, :stdin_data=>str)
+      raise "command '#{cmd.inspect}' failed; more details follow:  #{err}" unless s.exitstatus == 0
+      [out, err]
+    end
+  end
+  
   class CommitMeta
     attr_reader :author, :sha, :message
 
@@ -70,7 +90,7 @@ module Dampfwalze
     end
 
     def mergeMessage
-      summary = commits.map {|c| c.summary(" * ")}.join('\n')
+      summary = commits.map {|c| c.summary(" * ")}.join("\n")
       <<eos
 #{@title}
 
@@ -82,10 +102,33 @@ Closes ##{@number} and squashes the following commits:
 eos
     end
 
+    def patch
+      status = "3"
+      url = patch_url
+      
+      while status[0] == "3"
+        easy = Curl::Easy.perform(url)
+        status = easy.status
+        url = easy.redirect_url
+      end
+
+      easy.body_str
+    end
+    
     def doCommit
       # curl -L #{pr.patch_url} | git apply --index
       # echo #{pr.mergeMessage} | git commit --author #{pr.primaryAuthor} --signoff -t -
+      spawn_with_input(patch, ["/usr/bin/git", "apply", "--index"])
+        
+      Tempfile.create('commit') do |commit|
+        commit.write(mergeMessage)
+        commit.flush
+        output = spawn_and_capture(["/usr/bin/git", "commit", "--author", pr.primaryAuthor, "--signoff", "-F", commit.path])
+        print output
+      end
     end
+
+    include ProcessHelpers
   end 
   
   class GHSession
