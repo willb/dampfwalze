@@ -4,6 +4,7 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 gem "octokit", "~> 4.0"
 gem "thor", "~> 0.19.0"
+gem "curb", "~> 0.9.1"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
