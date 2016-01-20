@@ -23,7 +23,6 @@
 # SOFTWARE.
 
 require 'octokit'
-require 'git'
 
 module Dampfwalze
   class CommitMeta
@@ -72,8 +71,6 @@ module Dampfwalze
 
     def mergeMessage
       summary = commits.map {|c| c.summary(" * ")}.join('\n')
-      git_config = Git.open(".").config
-      git_user = "#{git_config["user.name"]} <#{git_config["user.email"]}>"
       <<eos
 #{@title}
 
