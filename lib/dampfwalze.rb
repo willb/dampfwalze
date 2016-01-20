@@ -31,7 +31,7 @@ module Dampfwalze
 
     def initialize(sha, author, message)
       @sha = sha
-      @author = author
+      @author = "#{author[:name]} <#{author[:email]}>"
       @message = message || ""
     end
 
@@ -55,8 +55,19 @@ module Dampfwalze
 
     def commits
       @pr.rels[:commits].get.data.map do |c|
-        CommitMeta.new(c.sha, c.author, c.message)
+        CommitMeta.new(c.sha, c.commit.author, c.commit.message)
       end
+    end
+
+    def authorCounts
+      commits.map {|c| c.author}.inject(Hash.new(0)) do |hash, k|
+        hash[k] += 1
+        hash
+      end
+    end
+    
+    def primaryAuthor
+      authorCounts.sort_by {|k,v| -v}.map{|k,v| k}[0]
     end
 
     def mergeMessage
@@ -72,8 +83,13 @@ Closes ##{@number} and squashes the following commits:
 
 #{summary}
 
-Signed-off-by: #{git_user}
+#{ "Signed-off-by: #{git_user}" if @signoff }
 eos
+    end
+
+    def doCommit
+      # curl -L #{pr.patch_url} | git apply --index
+      # echo #{pr.mergeMessage} | git commit --author #{pr.primaryAuthor} --signoff -t -
     end
   end 
   
@@ -87,4 +103,5 @@ eos
       PRMeta.new(result)
     end
   end
+
 end
