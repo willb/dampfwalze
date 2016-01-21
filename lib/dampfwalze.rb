@@ -135,4 +135,14 @@ eos
     end
   end
 
+  module Config
+    class << self
+      attr_reader :options
+    end
+    
+    def self.set(options)
+      @options = options.clone.freeze
+      @options
+    end
+  end
 end
