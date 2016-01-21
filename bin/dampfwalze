@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require "thor"
+require "dampfwalze"
+require "fileutils"
+require "yaml"
+
+class DampfwalzeCLI < Thor
+  desc "patch USER/REPO PR", "pulls down a patch for pull request PR from USER/REPO, dumps to stdout"
+  def patch(repo, pr)
+    print session.pr(repo, pr.to_i).patch
+  end
+
+  desc "merge-message USER/REPO PR", "generates a commit message for pull request PR from USER/REPO, dumps to stdout"
+  def merge_message(repo, pr)
+    print session.pr(repo, pr.to_i).mergeMessage
+  end
+  
+  desc "do-commit USER/REPO PR", "applies the changes from the specified PR to the working directory and commits with a generated message"
+  def do_commit(repo, pr)
+    session.pr(repo, pr.to_i).doCommit
+  end
+  
+  private
+  def config
+    @config ||= Dampfwalze::Config.set(read_config)
+  end
+
+  def read_config
+    configFile = File.join(Dir.home, ".dampfwalze")
+    unless File.exist?(configFile)
+      print("can't find a configuration file at #{configFile}; creating one")
+      print("edit it and try again!")
+      File.open(configFile, "w+", 0600) do |f|
+        f.write(YAML.dump({:git_binary => "/usr/bin/git", :github_user => ENV["LOGNAME"] || "your_username_here", :github_token => "your_github_token_here"}))
+      end
+      exit(1)
+    end
+    YAML.load_file(configFile)
+  end
+  
+  def session
+    user = config[:github_user]
+    token = config[:github_token]
+    Dampfwalze::GHSession.new(user, token)
+  end
+end
+
+DampfwalzeCLI.start
