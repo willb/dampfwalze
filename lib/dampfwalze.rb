@@ -117,8 +117,9 @@ eos
     def doCommit
       # curl -L #{pr.patch_url} | git apply --index
       # echo #{pr.mergeMessage} | git commit --author #{pr.primaryAuthor} --signoff -t -
-      spawn_with_input(patch, ["/usr/bin/git", "apply", "--index"])
-      spawn_with_input(mergeMessage, ["/usr/bin/git", "commit", "--author", pr.primaryAuthor, "--signoff", "-F", commit.path])
+      git = Config.options[:git_binary] || "/usr/bin/git"
+      spawn_with_input(patch, [git, "apply", "--index"])
+      spawn_with_input(mergeMessage, [git, "commit", "--author", pr.primaryAuthor, "--signoff", "-F", "-"])
     end
 
     include ProcessHelpers
