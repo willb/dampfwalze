@@ -16,11 +16,21 @@ class DampfwalzeCLI < Thor
     print session.pr(repo, pr.to_i).mergeMessage
   end
   
+  desc "primary-author USER/REPO PR", "identifies the primary author for USER/REPO/#PR; dumps to stdout"
+  def primary_author(repo, pr)
+    print session.pr(repo, pr.to_i).primaryAuthor
+  end
+  
   desc "do-commit USER/REPO PR", "applies the changes from the specified PR to the working directory and commits with a generated message"
   def do_commit(repo, pr)
     session.pr(repo, pr.to_i).doCommit
   end
-  
+
+    desc "mock-commit USER/REPO PR", "echos what do-commit USER/REPO PR would do"
+  def mock_commit(repo, pr)
+    session.pr(repo, pr.to_i).mockCommit
+  end
+
   private
   def config
     @config ||= Dampfwalze::Config.set(read_config)

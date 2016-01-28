@@ -113,13 +113,23 @@ eos
 
       easy.body_str
     end
-    
+
+    def mockCommit
+      git = Config.options[:git_binary] || "/usr/bin/git"
+      print("PATCH FOLLOWS:")
+      print(patch)
+      print([git, "apply", "--index"])
+      print("MERGE MESSAGE FOLLOWS:")
+      print(mergeMessage)
+      print([git, "commit", "--author", primaryAuthor, "--signoff", "-F", "-"])
+    end
+      
     def doCommit
       # curl -L #{pr.patch_url} | git apply --index
       # echo #{pr.mergeMessage} | git commit --author #{pr.primaryAuthor} --signoff -t -
       git = Config.options[:git_binary] || "/usr/bin/git"
-      spawn_with_input(patch, [git, "apply", "--index"])
-      spawn_with_input(mergeMessage, [git, "commit", "--author", pr.primaryAuthor, "--signoff", "-F", "-"])
+      spawn_with_input(patch, git, "apply", "--index")
+      spawn_with_input(mergeMessage, git, "commit", "--author", primaryAuthor, "--signoff", "-F", "-")
     end
 
     include ProcessHelpers
